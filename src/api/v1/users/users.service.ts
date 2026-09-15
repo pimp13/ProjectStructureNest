@@ -1,48 +1,34 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import type { Cache } from 'cache-manager';
+import { CacheService } from '../../../common/cache/cache.service.js';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly cacheService: CacheService,
   ) {}
 
   create(createUserDto: CreateUserDto) {
     return 'This action adds a new user';
   }
 
-  async remember<T>(
-    key: string,
-    ttl: number,
-    callback: () => Promise<T>,
-  ): Promise<T> {
-    const cached = await this.cacheManager.get<T>(key);
-    if (cached) {
-      return cached;
-    }
-
-    const result = await callback();
-    await this.cacheManager.set(key, result, ttl);
-    return result;
-  }
-
   async findAll() {
     const cacheKey = 'users.list';
-    const cachedUsers = await this.cacheManager.get(cacheKey);
+    const cachedUsers = await this.cacheService.get(cacheKey);
     if (cachedUsers) {
+      console.log('Get Data from redis...');
       return cachedUsers;
     }
 
+    console.log('Get Data from DB...');
     const users = await this.prisma.user.findMany({
       orderBy: { createdAt: 'desc' },
     });
 
-    await this.cacheManager.set(cacheKey, users, 24 * 60 * 60 * 1000);
+    await this.cacheService.set(cacheKey, users, 24 * 60 * 60 * 1000);
 
     return users;
     // await this.cacheManager.del('users.list');
