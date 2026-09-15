@@ -3,6 +3,7 @@ import { AppModule } from './app.module.js';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -32,6 +33,8 @@ async function bootstrap() {
       },
     }),
   );
+
+  app.use(cookieParser());
 
   const port = configService.get<number>('APP_PORT', 5000);
   console.log(`Server is running on ${port}`);
