@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
@@ -16,6 +16,11 @@ async function bootstrap() {
     //   { path: 'docs', method: RequestMethod.GET },
     //   'metrics', // همه متدهای این مسیر
     // ],
+  });
+
+  app.enableVersioning({
+    type: VersioningType.URI,
+    // prefix: 'v', // پیش‌فرض همین است (اختیاری)
   });
 
   const config = new DocumentBuilder()

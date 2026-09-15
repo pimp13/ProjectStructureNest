@@ -15,7 +15,7 @@ import { LoginDto } from './dto/login.dto.js';
 import { JwtAuthGuard } from './auth.guard.js';
 
 @ApiTags()
-@Controller('auth')
+@Controller({ path: 'auth', version: '1' })
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
