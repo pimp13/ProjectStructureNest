@@ -1,9 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const configService = app.get(ConfigService);
 
   const config = new DocumentBuilder()
     .setTitle('MY API')
@@ -12,8 +16,25 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup(
+    configService.get<string>('API_DOC_URL', 'docs'),
+    app,
+    document,
+  );
 
-  await app.listen(process.env.PORT ?? 3000);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // فیلدهای اضافی که در DTO تعریف نشده‌اند را حذف می‌کند
+      forbidNonWhitelisted: true, // اگر فیلد اضافی ارسال شود، خطا می‌دهد
+      transform: true, // تبدیل خودکار نوع داده‌ها (مثلاً string به number)
+      transformOptions: {
+        enableImplicitConversion: true, // تبدیل ضمنی نوع‌ها
+      },
+    }),
+  );
+
+  const port = configService.get<number>('APP_PORT', 5000);
+  console.log(`Server is running on ${port}`);
+  await app.listen(port);
 }
 await bootstrap();
