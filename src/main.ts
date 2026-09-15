@@ -10,6 +10,14 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
+  app.setGlobalPrefix(configService.get<string>('API_PREFIX', 'api'), {
+    // exclude: [
+    //   { path: 'health', method: RequestMethod.GET },
+    //   { path: 'docs', method: RequestMethod.GET },
+    //   'metrics', // همه متدهای این مسیر
+    // ],
+  });
+
   const config = new DocumentBuilder()
     .setTitle('MY API')
     .setDescription('My NestJS API Documentation')
