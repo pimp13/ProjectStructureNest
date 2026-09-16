@@ -4,11 +4,16 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
+import { ResponseWrapperInterceptor } from './common/response-wrapper/response-wrapper.interceptor.js';
+import { HttpExceptionFilter } from './common/http-exception/http-exception.filter.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService);
+
+  app.useGlobalInterceptors(new ResponseWrapperInterceptor());
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   app.setGlobalPrefix(configService.get<string>('API_PREFIX', 'api'), {
     // exclude: [
