@@ -45,11 +45,8 @@ export class AuthController {
       path: '/',
     });
     return {
-      ok: true,
       message: 'ورود با موفقیت انجام شد',
-      data: {
-        user: result.user,
-      },
+      user: result.user,
     };
   }
 
@@ -57,10 +54,7 @@ export class AuthController {
   @Get('me')
   async me(@Req() request: any) {
     return {
-      success: true,
-      data: {
-        user: request.user,
-      },
+      user: request.user,
     };
   }
 }

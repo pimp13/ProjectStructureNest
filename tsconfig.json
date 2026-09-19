@@ -13,12 +13,31 @@
     "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./",
     "incremental": true,
     "skipLibCheck": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "types": ["vitest/globals", "node"]
+    "types": [
+      "vitest/globals",
+      "node"
+    ],
+    "paths": {
+      "@app/prisma": [
+        "./libs/prisma/src"
+      ],
+      "@app/prisma/*": [
+        "./libs/prisma/src/*"
+      ]
+    }
   },
-  "include": ["./src/*.ts"]
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/laravel-with-nestjs/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/admin-panel/tsconfig.app.json"
+    }
+  ]
 }
