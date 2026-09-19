@@ -18,17 +18,12 @@
     "skipLibCheck": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "types": [
-      "vitest/globals",
-      "node"
-    ],
+    "types": ["vitest/globals", "node"],
     "paths": {
-      "@app/prisma": [
-        "./libs/prisma/src"
-      ],
-      "@app/prisma/*": [
-        "./libs/prisma/src/*"
-      ]
+      "@app/cache": ["./libs/cache/src"],
+      "@app/cache/*": ["./libs/cache/src/*"],
+      "@app/prisma": ["./libs/prisma/src"],
+      "@app/prisma/*": ["./libs/prisma/src/*"]
     }
   },
   "files": [],
