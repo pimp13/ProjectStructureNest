@@ -13,6 +13,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/login.dto.js';
 import { JwtAuthGuard } from './auth.guard.js';
+import { CreateUserDto } from '../users/dto/create-user.dto.js';
 
 @ApiTags()
 @Controller({ path: 'auth', version: '1' })
@@ -51,6 +52,11 @@ export class AuthController {
         user: result.user,
       },
     };
+  }
+
+  @Post('register')
+  async register(@Body() bodyData: CreateUserDto) {
+    return this.authService.registerUser(bodyData);
   }
 
   @UseGuards(JwtAuthGuard)
