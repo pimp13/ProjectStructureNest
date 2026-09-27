@@ -22,17 +22,25 @@ enum Visibility {
   @@map("visibility") // اختیاری - اگر می‌خواهید در دیتابیس هم این نام باشه
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  password  String
-  username  String   @unique
-  role      String
-  posts     Post[]
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+enum UserRoleEnum {
+  user
+  admin
+  superAdmin
+}
 
+model User {
+  id        Int          @id @default(autoincrement())
+  email     String       @unique
+  name      String?
+  isActive  Boolean      @default(true) @map("is_active")
+  password  String
+  username  String       @unique
+  role      UserRoleEnum @default(user)
+  posts     Post[]
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  @@index([role, isActive])
   @@map("users")
 }
 
