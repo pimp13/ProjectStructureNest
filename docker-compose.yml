@@ -1,0 +1,49 @@
+name: nest-app
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nest-api:prod
+    container_name: nest_api
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@postgres:5432/${DB_NAME}?schema=public
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - nest_net
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: nest_postgres
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - nest_net
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  nest_net:
+    driver: bridge

@@ -2,12 +2,16 @@ FROM node:24-alpine
 
 WORKDIR /usr/src/app
 
+RUN apk add --no-cache tini openssl
+
 COPY package*.json ./
+COPY prisma ./prisma
 
-RUN npm i
+RUN npm install
 
-COPY . .
+RUN npx prisma generate
 
 EXPOSE 3000
 
-CMD [ "npm", "run", "dev" ]
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["npm", "run", "start:dev"]
