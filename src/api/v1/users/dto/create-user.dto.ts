@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { InputJsonValue } from '@prisma/client/runtime/library';
 import {
   IsBoolean,
   IsEmail,
@@ -21,12 +22,12 @@ export class CreateUserDto {
   @ApiProperty({ default: null })
   @IsString()
   @IsOptional()
-  name!: string;
+  name?: string;
 
   @ApiProperty({ default: true })
   @IsBoolean()
   @IsOptional()
-  isActive: boolean;
+  isActive?: boolean;
 
   @ApiProperty({ description: 'حاوی عدد و حروف' })
   @IsString()
@@ -35,7 +36,7 @@ export class CreateUserDto {
   @Matches(/^(?=.*[A-Za-z])(?=.*\d).+$/, {
     message: 'Password must contain at least one letter and one number',
   })
-  password: string;
+  password!: string;
 
   @ApiProperty()
   @IsString()
@@ -46,5 +47,5 @@ export class CreateUserDto {
   @ApiProperty({ description: 'Metadata', default: null })
   @IsObject()
   @IsOptional()
-  meta: Record<string, unknown>;
+  meta?: InputJsonValue | null;
 }

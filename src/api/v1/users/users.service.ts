@@ -3,6 +3,8 @@ import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import { CacheService } from '../../../common/cache/cache.service.js';
+import * as bcrypt from 'bcrypt';
+import { UserRoleEnum } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -11,8 +13,21 @@ export class UsersService {
     private readonly cacheService: CacheService,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(bodyData: CreateUserDto) {
+    const hashedPassword = await bcrypt.hash(bodyData.password, 12);
+    const user = await this.prisma.user.create({
+      data: {
+        email: bodyData.email,
+        password: hashedPassword,
+        username: bodyData.username,
+        isActive: bodyData.isActive,
+        name: bodyData.name,
+        role: UserRoleEnum.user,
+        meta: bodyData.meta ?? undefined,
+      },
+    });
+
+    return user;
   }
 
   async findAll() {
@@ -45,6 +60,19 @@ export class UsersService {
     return await this.prisma.user.findUnique({
       where: { email },
     });
+  }
+
+  async isEmailExists(email: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return Boolean(user);
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
