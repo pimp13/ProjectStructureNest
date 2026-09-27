@@ -2,10 +2,12 @@ node_modules
 dist
 .git
 .gitignore
-Dockerfile
-docker-compose.yml
-*.md
 .env
 .env.*
+!.env.example
+Dockerfile*
+docker-compose*.yaml
+*.md
 coverage
 .vscode
+.idea
