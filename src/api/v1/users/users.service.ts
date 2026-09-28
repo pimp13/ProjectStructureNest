@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import { CacheService } from '../../../common/cache/cache.service.js';
 import * as bcrypt from 'bcrypt';
-import { UserRoleEnum } from '@prisma/client';
+import { User, UserRoleEnum } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -34,7 +34,7 @@ export class UsersService {
     const cacheKey = 'users.list';
     const cachedUsers = await this.cacheService.get(cacheKey);
     if (cachedUsers) {
-      console.log('Get Data from redis...');
+      console.log('** Get Data from redis **...');
       return cachedUsers;
     }
 
@@ -51,9 +51,24 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    return await this.prisma.user.findUnique({
+    const cacheKey = `users.by-id.${id}`;
+    const cachedUser = await this.cacheService.get<User | null>(cacheKey);
+    if (cachedUser) {
+      console.log('** Get Data from redis **');
+      return cachedUser;
+    }
+    console.log('Get Data from DB...');
+
+    const userData = await this.prisma.user.findUnique({
       where: { id },
     });
+    await this.cacheService.set<User | null>(
+      cacheKey,
+      userData,
+      24 * 60 * 60 * 1000,
+    );
+
+    return userData;
   }
 
   async findByEmail(email: string) {
