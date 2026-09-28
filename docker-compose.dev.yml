@@ -13,6 +13,8 @@ services:
       - NODE_ENV=development
       - PORT=3000
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@postgres:5432/${DB_NAME}?schema=public
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     ports:
       - "3000:3000"
       - "9229:9229"
@@ -25,6 +27,8 @@ services:
       - /usr/src/app/node_modules
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - nest_net
@@ -50,6 +54,38 @@ services:
     networks:
       - nest_net
 
+  redis:
+    image: redis:8.10.1-alpine
+    container_name: nest_redis_dev
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_HOST_PORT}:6379"
+    volumes:
+      - redis_data_dev:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - nest_net
+    restart: unless-stopped
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: nest_redis_commander_dev
+    environment:
+      - REDIS_HOSTS=local:redis:6379:0:${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_COMMANDER_PORT}:8081"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - nest_net
+    restart: unless-stopped
+
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: nest_pgadmin_dev
@@ -67,6 +103,7 @@ services:
 
 volumes:
   postgres_data_dev:
+  redis_data_dev:
 
 networks:
   nest_net:
