@@ -31,19 +31,19 @@ export class UsersService {
   }
 
   async findAll() {
-    const cacheKey = 'users.list';
-    const cachedUsers = await this.cacheService.get(cacheKey);
-    if (cachedUsers) {
-      console.log('** Get Data from redis **...');
-      return cachedUsers;
-    }
+    // const cacheKey = 'users.list';
+    // const cachedUsers = await this.cacheService.get(cacheKey);
+    // if (cachedUsers) {
+    //   console.log('** Get Data from redis **...');
+    //   return cachedUsers;
+    // }
 
     console.log('Get Data from DB...');
     const users = await this.prisma.user.findMany({
       orderBy: { createdAt: 'desc' },
     });
 
-    await this.cacheService.set(cacheKey, users, 24 * 60 * 60 * 1000);
+    // await this.cacheService.set(cacheKey, users, 24 * 60 * 60 * 1000);
 
     return users;
     // await this.cacheManager.del('users.list');
@@ -51,22 +51,22 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    const cacheKey = `users.by-id.${id}`;
-    const cachedUser = await this.cacheService.get<User | null>(cacheKey);
-    if (cachedUser) {
-      console.log('** Get Data from redis **');
-      return cachedUser;
-    }
-    console.log('Get Data from DB...');
+    // const cacheKey = `users.by-id.${id}`;
+    // const cachedUser = await this.cacheService.get<User | null>(cacheKey);
+    // if (cachedUser) {
+    //   console.log('** Get Data from redis **');
+    //   return cachedUser;
+    // }
+    // console.log('Get Data from DB...');
 
     const userData = await this.prisma.user.findUnique({
       where: { id },
     });
-    await this.cacheService.set<User | null>(
-      cacheKey,
-      userData,
-      24 * 60 * 60 * 1000,
-    );
+    // await this.cacheService.set<User | null>(
+    //   cacheKey,
+    //   userData,
+    //   24 * 60 * 60 * 1000,
+    // );
 
     return userData;
   }
@@ -90,8 +90,23 @@ export class UsersService {
     return Boolean(user);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, bodyData: UpdateUserDto) {
+    const user = await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: bodyData.isActive ?? true,
+        meta: bodyData.meta ?? undefined,
+        email: bodyData.email,
+        name: bodyData.name ?? null,
+        username: bodyData.username,
+        updatedAt: new Date(),
+        role: 'user',
+      },
+    });
+
+    return { user };
   }
 
   remove(id: number) {
