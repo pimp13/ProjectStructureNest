@@ -4,6 +4,7 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+//* ---------------- CONNECTIONS -----------------
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,6 +14,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//* ---------------- ENUMS -----------------
 enum Visibility {
   general
   private
@@ -22,29 +24,73 @@ enum Visibility {
   @@map("visibility") // اختیاری - اگر می‌خواهید در دیتابیس هم این نام باشه
 }
 
-enum UserRoleEnum {
-  user
-  admin
-  superAdmin
-}
-
+//* ---------------- USER MODEL -----------------
 model User {
-  id        Int          @id @default(autoincrement())
-  email     String       @unique
-  name      String?
-  isActive  Boolean      @default(true) @map("is_active")
-  password  String
-  username  String       @unique
-  role      UserRoleEnum @default(user)
-  meta      Json?
-  posts     Post[]
-  createdAt DateTime     @default(now()) @map("created_at")
-  updatedAt DateTime     @updatedAt @map("updated_at")
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
+  isActive Boolean @default(true) @map("is_active")
+  password String
+  username String  @unique
+  meta     Json?
 
-  @@index([role, isActive])
+  roleId Int  @map("role_id")
+  role   Role @relation(fields: [roleId], references: [id])
+
+  posts Post[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([roleId, isActive])
   @@map("users")
 }
 
+//* ---------------- ROLE AND PERMISSION MODEL -----------------
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  users       User[]
+  permissions RolePermission[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("roles")
+}
+
+model Permission {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  resource    String
+  action      String
+  description String?
+
+  roles RolePermission[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([resource])
+  @@index([action])
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       Int @map("role_id")
+  permissionId Int @map("permission_id")
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+//* ---------------- WEB LOG MODELS -----------------
 model Post {
   id            Int        @id @default(autoincrement())
   userId        Int?       @map("user_id")
