@@ -4,6 +4,7 @@ import {
   IsBoolean,
   IsEmail,
   IsNotEmpty,
+  IsNumber,
   IsObject,
   IsOptional,
   IsString,
@@ -48,4 +49,9 @@ export class CreateUserDto {
   @IsObject()
   @IsOptional()
   meta?: InputJsonValue | null;
+
+  @ApiProperty({ description: 'Metadata', default: null })
+  @IsNumber()
+  @IsOptional()
+  role?: number | null;
 }

@@ -4,7 +4,6 @@ import { UpdateUserDto } from './dto/update-user.dto.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import { CacheService } from '../../../common/cache/cache.service.js';
 import * as bcrypt from 'bcrypt';
-import { User, UserRoleEnum } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -22,8 +21,9 @@ export class UsersService {
         username: bodyData.username,
         isActive: bodyData.isActive,
         name: bodyData.name,
-        role: UserRoleEnum.user,
+        // role: UserRoleEnum.user,
         meta: bodyData.meta ?? undefined,
+        roleId: bodyData.role ?? 1,
       },
     });
 
@@ -102,7 +102,7 @@ export class UsersService {
         name: bodyData.name ?? null,
         username: bodyData.username,
         updatedAt: new Date(),
-        role: 'user',
+        // role: 'user',
       },
     });
 
