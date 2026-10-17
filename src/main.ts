@@ -19,7 +19,7 @@ type CorsOptions = {
 };
 
 function enableCors(app: INestApplication, options?: CorsOptions) {
-  const defaultOrigins = ['http://localhost:4200', 'https://your-frontend.com'];
+  const defaultOrigins = ['http://localhost:3002', 'https://your-frontend.com'];
 
   const defaultMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 

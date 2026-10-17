@@ -53,5 +53,5 @@ export class CreateUserDto {
   @ApiProperty({ description: 'Metadata', default: null })
   @IsNumber()
   @IsOptional()
-  role?: number | null;
+  roleId?: number | null;
 }

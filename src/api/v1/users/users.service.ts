@@ -10,24 +10,30 @@ export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cacheService: CacheService,
-  ) {}
+  ) { }
 
   async create(bodyData: CreateUserDto) {
-    const hashedPassword = await bcrypt.hash(bodyData.password, 12);
-    const user = await this.prisma.user.create({
-      data: {
-        email: bodyData.email,
-        password: hashedPassword,
-        username: bodyData.username,
-        isActive: bodyData.isActive,
-        name: bodyData.name,
-        // role: UserRoleEnum.user,
-        meta: bodyData.meta ?? undefined,
-        roleId: bodyData.role ?? 1,
-      },
-    });
+    try {
+      const hashedPassword = await bcrypt.hash(bodyData.password, 12);
 
-    return user;
+      const user = await this.prisma.user.create({
+        data: {
+          email: bodyData.email,
+          password: hashedPassword,
+          username: bodyData.username,
+          isActive: bodyData.isActive,
+          name: bodyData.name,
+          // role: UserRoleEnum.user,
+          meta: bodyData.meta ?? undefined,
+          roleId: bodyData.roleId ?? 1,
+        },
+      });
+
+      return user;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
   }
 
   async findAll() {
@@ -40,8 +46,16 @@ export class UsersService {
 
     console.log('Get Data from DB...');
     const users = await this.prisma.user.findMany({
+      include: {
+        role: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
+    console.log('users', users);
+
+    if (!users || users.length === 0) {
+      return [];
+    }
 
     // await this.cacheService.set(cacheKey, users, 24 * 60 * 60 * 1000);
 
