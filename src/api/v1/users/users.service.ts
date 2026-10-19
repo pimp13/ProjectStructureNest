@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto.js';
-import { UpdateUserDto } from './dto/update-user.dto.js';
-import { PrismaService } from '../../../prisma/prisma.service.js';
-import { CacheService } from '../../../common/cache/cache.service.js';
-import * as bcrypt from 'bcrypt';
+import { Injectable } from "@nestjs/common";
+import { CreateUserDto } from "./dto/create-user.dto.js";
+import { UpdateUserDto } from "./dto/update-user.dto.js";
+import { PrismaService } from "../../../prisma/prisma.service.js";
+import { CacheService } from "../../../common/cache/cache.service.js";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class UsersService {
@@ -44,14 +44,14 @@ export class UsersService {
     //   return cachedUsers;
     // }
 
-    console.log('Get Data from DB...');
+    console.log("Get Data from DB...");
     const users = await this.prisma.user.findMany({
       include: {
         role: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
-    console.log('users', users);
+    console.log("users", users);
 
     if (!users || users.length === 0) {
       return [];
