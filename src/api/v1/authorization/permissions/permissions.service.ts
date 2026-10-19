@@ -9,7 +9,7 @@ import { UpdatePermissionDto } from './dto/update-permission.dto.js';
 
 @Injectable()
 export class PermissionsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(dto: CreatePermissionDto) {
     const existing = await this.prisma.permission.findUnique({
@@ -34,6 +34,9 @@ export class PermissionsService {
 
   async findAll() {
     return this.prisma.permission.findMany({
+      include: {
+        _count: { select: { roles: true } }
+      },
       orderBy: [
         {
           resource: 'asc',
