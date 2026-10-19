@@ -14,7 +14,7 @@ import { UpdateRoleDto } from './dto/update-role.dto.js';
 
 @Controller({ path: 'roles', version: '1' })
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) {}
+  constructor(private readonly rolesService: RolesService) { }
 
   @Post()
   create(@Body() dto: CreateRoleDto) {
@@ -52,6 +52,14 @@ export class RolesController {
     return this.rolesService.remove(id);
   }
 
+  @Get(':roleId/permissions')
+  findRolePermissions(
+    @Param('roleId', ParseIntPipe)
+    roleId: number
+  ) {
+    return this.rolesService.findRolePermissions(roleId);
+  }
+
   @Post(':roleId/users/:userId')
   assignToUser(
     @Param('roleId', ParseIntPipe)
@@ -62,4 +70,7 @@ export class RolesController {
   ) {
     return this.rolesService.assignToUser(roleId, userId);
   }
+
+
+
 }

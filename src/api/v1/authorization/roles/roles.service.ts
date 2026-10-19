@@ -9,7 +9,7 @@ import { UpdateRoleDto } from './dto/update-role.dto.js';
 
 @Injectable()
 export class RolesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(dto: CreateRoleDto) {
     const existingRole = await this.prisma.role.findUnique({
@@ -164,5 +164,27 @@ export class RolesService {
         role: true,
       },
     });
+  }
+
+
+  async findRolePermissions(roleId: number) {
+    const role = await this.prisma.role.findUnique({
+      where: {
+        id: roleId,
+      },
+      include: {
+        permissions: {
+          include: {
+            permission: true,
+          },
+        },
+      },
+    });
+
+    if (!role) {
+      throw new NotFoundException('Role not found');
+    }
+
+    return role.permissions.map((rp) => rp.permission);
   }
 }
